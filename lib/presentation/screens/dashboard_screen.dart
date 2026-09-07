@@ -29,7 +29,7 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
+          SliverAppBar.medium(
             title: const Text('Pocket Ledger'),
             actions: [
               _MonthStepper(month: month),
@@ -37,12 +37,9 @@ class DashboardScreen extends ConsumerWidget {
             ],
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              Insets.lg,
-              0,
-              Insets.lg,
-              Insets.xxl * 2,
-            ),
+            // Clears the extended FAB (56dp tall plus its 16dp margin) so the
+            // last card is fully readable at the bottom of the scroll.
+            padding: const EdgeInsets.fromLTRB(Insets.lg, 0, Insets.lg, 88),
             sliver: SliverList.list(
               children: const [
                 _BalanceCard(),
