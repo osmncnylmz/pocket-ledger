@@ -1,0 +1,38 @@
+name: pocket_ledger
+description: Offline-first personal expense tracker built with Flutter and a real SQLite schema.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # SQLite: schema, type-safe queries, migrations.
+  drift: ^2.34.4
+  # Platform glue for drift (bundled SQLite + application documents directory).
+  drift_flutter: ^0.3.1
+  # State management.
+  flutter_riverpod: ^3.4.3
+  # Currency and date formatting.
+  intl: ^0.20.3
+  # Persisted user settings (theme, currency).
+  shared_preferences: ^2.5.5
+  # Where backup files are written.
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  cupertino_icons: ^1.0.8
+  # Annotations only (@immutable); keeps the domain layer Flutter-free.
+  meta: ^1.17.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.34.6
+  build_runner: ^2.16.1
+
+flutter:
+  uses-material-design: true
