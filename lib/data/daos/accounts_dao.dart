@@ -8,17 +8,14 @@ import '../mappers.dart';
 
 part 'accounts_dao.g.dart';
 
-/// Queries over accounts and the balances derived from their entries.
 @DriftAccessor(tables: [Accounts, Transactions])
 class AccountsDao extends DatabaseAccessor<AppDatabase>
     with _$AccountsDaoMixin {
   AccountsDao(super.db);
 
-  /// Accounts with their live balance.
-  ///
-  /// The balance is `opening_balance_minor + COALESCE(SUM(amount_minor), 0)`,
-  /// evaluated by SQLite in a single grouped left join. Reading every row and
-  /// adding it up in Dart would work for a demo and fall over for a ledger.
+  /// `opening_balance_minor + COALESCE(SUM(amount_minor), 0)`, evaluated by
+  /// SQLite in one grouped left join. Reading every row and adding it up in
+  /// Dart works fine for a demo and falls over for a ledger.
   Stream<List<AccountBalance>> watchBalances({bool includeArchived = false}) {
     final posted = transactions.amountMinor.sum();
     final balance =
@@ -53,12 +50,12 @@ class AccountsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Total net worth per currency, so a ledger holding both EUR and USD
-  /// accounts reports two honest numbers instead of one meaningless one.
+  /// A ledger holding EUR and USD accounts gets two honest numbers rather
+  /// than one meaningless one.
   ///
-  /// Written by hand because the balance has to be folded up in two stages:
-  /// per account first (otherwise the left join repeats each opening balance
-  /// once per entry and inflates the total), then per currency.
+  /// Hand-written SQL because the fold happens in two stages: per account
+  /// first — otherwise the left join repeats each opening balance once per
+  /// entry and inflates the total — then per currency.
   Stream<Map<Currency, Money>> watchTotalsByCurrency() {
     return customSelect(
       '''
@@ -165,12 +162,9 @@ ORDER BY currency_code
     );
   }
 
-  /// Deletes an account and everything posted to it.
-  ///
-  /// The entries in this account go away by `ON DELETE CASCADE`, but that would
-  /// leave the *far* leg of every transfer stranded in another account, still
-  /// claiming to be a transfer. So those are removed first, in the same
-  /// transaction.
+  /// Entries in this account go by `ON DELETE CASCADE`. That alone would
+  /// strand the *far* leg of every transfer in another account, still claiming
+  /// to be a transfer, so those are removed first in the same transaction.
   Future<void> deleteAccount(int id) {
     return transaction(() async {
       await customStatement(

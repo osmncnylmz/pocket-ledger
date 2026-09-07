@@ -2,11 +2,9 @@ import 'package:drift/drift.dart';
 
 import '../domain/enums.dart';
 
-/// Places money sits.
-///
-/// A ledger account is never deleted implicitly: it is archived, which keeps
-/// history intact. Hard deletion exists but goes through `AccountsDao` so that
-/// the far leg of every transfer is cleaned up in the same SQL transaction.
+/// Archiving hides an account and keeps its history readable. Hard deletion
+/// exists too, but it goes through `AccountsDao` so the far leg of every
+/// transfer is cleaned up in the same SQL transaction.
 @DataClassName('AccountRow')
 @TableIndex(name: 'idx_accounts_sort', columns: {#archived, #sortOrder})
 class Accounts extends Table {
@@ -61,11 +59,9 @@ class Categories extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-/// One posted line of the ledger.
-///
 /// `amountMinor` is signed: negative leaves the account, positive enters it.
-/// The `CHECK` constraints below make the invariant the database's problem
-/// rather than a convention the app has to remember.
+/// The `CHECK` constraints below put that in the database, where the app
+/// cannot forget it.
 @DataClassName('TransactionRow')
 @TableIndex(
   name: 'idx_transactions_date',
@@ -95,7 +91,6 @@ class Transactions extends Table {
     onDelete: KeyAction.setNull,
   )();
 
-  /// Signed minor units. Never a floating point number, anywhere.
   IntColumn get amountMinor => integer()();
 
   DateTimeColumn get date => dateTime()();
@@ -132,7 +127,6 @@ CHECK (
   ];
 }
 
-/// A recurring spending limit for one category.
 @DataClassName('BudgetRow')
 class Budgets extends Table {
   IntColumn get id => integer().autoIncrement()();

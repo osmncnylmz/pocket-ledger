@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
 
-/// A currency, described by everything the app needs to store and render an
-/// amount without ever consulting a floating point number.
+/// Everything needed to store and render an amount without ever touching a
+/// floating point number.
 ///
 /// [decimalDigits] is the ISO 4217 "minor unit" exponent: 2 for USD (cents),
-/// 0 for JPY (there is no sub-yen unit).
+/// 0 for JPY, where there is no sub-yen unit at all.
 @immutable
 final class Currency {
   const Currency._(
@@ -14,17 +14,14 @@ final class Currency {
     this.symbolOnLeft = true,
   });
 
-  /// ISO 4217 alphabetic code. This is what is stored in the database.
+  /// ISO 4217 alphabetic code; this is what the `currency_code` column holds.
   final String code;
 
-  /// Display symbol.
   final String symbol;
 
-  /// Number of digits after the decimal separator, i.e. the exponent of the
-  /// minor unit. `100 minor units == 1 major unit` when this is 2.
+  /// Exponent of the minor unit. At 2, 100 minor units make one major unit.
   final int decimalDigits;
 
-  /// Whether the symbol is conventionally written before the digits.
   final bool symbolOnLeft;
 
   static const usd = Currency._('USD', r'$', 2);
@@ -37,7 +34,6 @@ final class Currency {
   /// verified by hand, and inventing the other 150 would be worse than useless.
   static const supported = <Currency>[usd, eur, gbp, tryLira, jpy];
 
-  /// 10^[decimalDigits], as an exact integer.
   int get minorUnitsPerMajor => _pow10[decimalDigits];
 
   static const _pow10 = <int>[1, 10, 100, 1000, 10000];
@@ -52,7 +48,6 @@ final class Currency {
     return usd;
   }
 
-  /// Whether [code] names a currency this build knows about.
   static bool isSupported(String code) {
     final upper = code.toUpperCase();
     return supported.any((c) => c.code == upper);
@@ -70,17 +65,16 @@ final class Currency {
 
 /// An exact monetary amount, stored as a signed count of minor units.
 ///
-/// The entire app — schema, aggregates, parsing, rendering — moves money around
-/// as [int]. No `double` is involved at any point, so `0.1 + 0.2` can never
-/// become `0.30000000000000004` in a balance.
+/// Schema, aggregates, parsing and rendering all move money around as [int].
+/// No `double` is involved anywhere, so `0.1 + 0.2` can never turn into
+/// `0.30000000000000004` in a balance.
 @immutable
 final class Money implements Comparable<Money> {
   const Money(this.minorUnits, this.currency);
 
   const Money.zero(this.currency) : minorUnits = 0;
 
-  /// Builds an amount from whole major units, e.g. `Money.major(12, usd)` is
-  /// `$12.00`.
+  /// `Money.major(12, usd)` is `$12.00`.
   Money.major(int majorUnits, this.currency)
     : minorUnits = majorUnits * currency.minorUnitsPerMajor;
 
@@ -158,9 +152,8 @@ final class Money implements Comparable<Money> {
     return minorUnits >= other.minorUnits;
   }
 
-  /// This amount as a fraction of [total], in percent, rounded half-up.
-  ///
-  /// Returns 0 when [total] is zero. Computed with integer arithmetic.
+  /// This amount as a percentage of [total], rounded half-up, 0 when [total]
+  /// is zero. Integer arithmetic, so the percentage is exact.
   int percentOf(Money total) {
     _assertSameCurrency(total);
     if (total.minorUnits == 0) return 0;
@@ -196,7 +189,6 @@ final class Money implements Comparable<Money> {
   @override
   String toString() => '${currency.code} $minorUnits';
 
-  /// Like [Money.parse] but returns `null` instead of throwing.
   static Money? tryParse(
     String input,
     Currency currency, {
@@ -279,7 +271,7 @@ final class Money implements Comparable<Money> {
   }
 }
 
-/// Sums [amounts], which must all share [currency].
+/// Throws if any amount is in another currency.
 Money sumMoney(Iterable<Money> amounts, Currency currency) {
   var total = 0;
   for (final amount in amounts) {

@@ -6,7 +6,7 @@ void main() {
     Money parse(String input, [Currency currency = Currency.usd]) =>
         Money.parse(input, currency);
 
-    test('reads whole and fractional amounts exactly', () {
+    test('parses whole and fractional amounts', () {
       expect(parse('0').minorUnits, 0);
       expect(parse('1').minorUnits, 100);
       expect(parse('12.34').minorUnits, 1234);
@@ -192,7 +192,7 @@ void main() {
       );
     });
 
-    test('equal amounts collapse in a set, so hashCode agrees with ==', () {
+    test('hashCode agrees with ==', () {
       // Built at runtime so the analyser cannot fold the two equal amounts
       // into one before the set ever sees them.
       final amounts = <Money>{
@@ -210,7 +210,7 @@ void main() {
   });
 
   group('currencies', () {
-    test('are looked up by code and fall back rather than throwing', () {
+    test('unknown codes fall back', () {
       expect(Currency.byCode('eur'), Currency.eur);
       expect(Currency.byCode('JPY').decimalDigits, 0);
       expect(Currency.byCode('XXX'), Currency.usd);

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-/// One month of the trend chart.
 @immutable
 class TrendPoint {
   const TrendPoint({
@@ -14,7 +13,7 @@ class TrendPoint {
     required this.expense,
   });
 
-  /// Short month label, e.g. "Mar".
+  /// Short form, e.g. "Mar".
   final String label;
 
   /// Minor units, both non-negative.
@@ -22,11 +21,8 @@ class TrendPoint {
   final int expense;
 }
 
-/// A six-month income/expense trend, drawn with [CustomPainter].
-///
-/// Two lines with a gradient fill under the expense curve, a horizontal grid
-/// scaled to the data, and a draggable read-out. The whole thing is one
-/// repaint; there is no chart library involved.
+/// Income and expense over the same months, with a draggable read-out. One
+/// `CustomPainter`, no chart library.
 class TrendChart extends StatefulWidget {
   const TrendChart({
     required this.points,
@@ -39,8 +35,7 @@ class TrendChart extends StatefulWidget {
 
   final List<TrendPoint> points;
 
-  /// Turns minor units into an axis label. Passed in so the chart never has to
-  /// know about currencies.
+  /// Passed in so the chart never has to know about currencies.
   final String Function(int minorUnits) formatValue;
 
   final int? selectedIndex;
@@ -194,7 +189,7 @@ class _TrendPainter extends CustomPainter {
       0,
       (best, p) => math.max(best, math.max(p.income, p.expense)),
     );
-    // A flat zero ledger still needs a sensible axis.
+    // An empty ledger still needs an axis to draw against.
     final axisMax = _niceCeiling(peak == 0 ? 1 : peak);
 
     final step = size.width / points.length;
@@ -296,8 +291,9 @@ class _TrendPainter extends CustomPainter {
           xFor(i - 1),
           yFor((values[i - 1] * progress).round()),
         );
-        // A gentle cubic between neighbours reads better than straight
-        // segments without inventing data between the months.
+        // A gentle cubic between neighbours, with the control points level
+        // with the endpoints so the curve never invents a month's worth of
+        // data by overshooting.
         final controlX = (previous.dx + point.dx) / 2;
         path.cubicTo(
           controlX,
@@ -371,8 +367,8 @@ class _TrendPainter extends CustomPainter {
     textDirection: textDirection,
   )..layout();
 
-  /// Rounds an axis maximum up to 1, 2 or 5 times a power of ten, so the grid
-  /// labels are numbers a person would choose.
+  /// Rounds up to 1, 2 or 5 times a power of ten, so the grid labels come out
+  /// as numbers a person would have picked.
   static int _niceCeiling(int value) {
     final magnitude = math
         .pow(10, (math.log(value) / math.ln10).floor())

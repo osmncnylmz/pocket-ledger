@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-/// A real empty state: what this screen is for, why it is blank, and the one
-/// thing worth doing about it.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     required this.icon,
@@ -19,7 +17,7 @@ class EmptyState extends StatelessWidget {
   final String message;
   final Widget? action;
 
-  /// Tighter layout, for an empty state inside a card rather than a screen.
+  /// Tighter layout, for use inside a card.
   final bool compact;
 
   @override

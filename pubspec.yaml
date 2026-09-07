@@ -10,15 +10,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # SQLite: schema, type-safe queries, migrations.
   drift: ^2.34.4
-  # Platform glue for drift (bundled SQLite + application documents directory).
+  # Bundled SQLite plus the application documents directory.
   drift_flutter: ^0.3.1
-  # State management.
   flutter_riverpod: ^3.4.3
-  # Currency and date formatting.
   intl: ^0.20.3
-  # Persisted user settings (theme, currency).
+  # Theme and display currency only; ledger data lives in SQLite.
   shared_preferences: ^2.5.5
   # Where backup files are written.
   path_provider: ^2.1.6

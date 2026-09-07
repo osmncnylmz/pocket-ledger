@@ -3,7 +3,7 @@ import 'package:pocket_ledger/domain/entities.dart';
 import 'package:pocket_ledger/domain/enums.dart';
 import 'package:pocket_ledger/domain/money.dart';
 
-/// Small helpers so the tests read as scenarios instead of insert statements.
+/// Small helpers so the tests read as scenarios.
 extension Fixtures on AppDatabase {
   Future<Account> makeAccount(
     String name, {

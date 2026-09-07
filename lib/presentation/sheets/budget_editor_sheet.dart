@@ -9,7 +9,6 @@ import '../providers.dart';
 import '../theme.dart';
 import '../widgets/amount_field.dart';
 
-/// Opens the budget editor. Pass [existing] to edit a limit already set.
 Future<void> showBudgetEditor(
   BuildContext context, {
   BudgetProgress? existing,
@@ -22,7 +21,6 @@ Future<void> showBudgetEditor(
   );
 }
 
-/// Sets or clears the limit for one category and period.
 class BudgetEditorSheet extends ConsumerStatefulWidget {
   const BudgetEditorSheet({super.key, this.existing});
 

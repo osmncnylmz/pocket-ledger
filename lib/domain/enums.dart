@@ -5,7 +5,6 @@
 /// change and needs a migration.
 library;
 
-/// The kind of a real-world account a ledger account stands for.
 enum AccountKind {
   cash,
   checking,
@@ -18,17 +17,11 @@ enum AccountKind {
   bool get isLiability => this == AccountKind.credit;
 }
 
-/// Whether a category groups money coming in or money going out.
 enum CategoryKind { income, expense }
 
-/// The semantic type of a ledger entry.
-///
-/// The sign of `amountMinor` is derived from this and is enforced by a `CHECK`
-/// constraint in the schema:
-///
-/// * [income] rows are strictly positive,
-/// * [expense] rows are strictly negative,
-/// * [transfer] rows are non-zero and always come in pairs with opposite signs.
+/// The sign of `amountMinor` follows from this, and a `CHECK` constraint in
+/// the schema enforces it: income strictly positive, expense strictly
+/// negative, transfer non-zero and always paired with an opposite-signed leg.
 enum TransactionType {
   income,
   expense,
@@ -37,7 +30,6 @@ enum TransactionType {
   bool get isTransfer => this == TransactionType.transfer;
 }
 
-/// The recurrence window a budget limit applies to.
 enum BudgetPeriod {
   weekly,
   monthly,
@@ -50,5 +42,4 @@ enum BudgetPeriod {
   };
 }
 
-/// How the user wants the app themed.
 enum AppThemeMode { system, light, dark }

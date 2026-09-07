@@ -5,11 +5,7 @@ import '../../domain/money.dart';
 import '../providers.dart';
 import '../theme.dart';
 
-/// Renders a [Money] with the app's formatter and, optionally, the
-/// income/expense colour.
-///
-/// Kept as a widget rather than a helper function so that every amount in the
-/// app picks up the same tabular figures and the same sign convention.
+/// Tabular figures and the sign convention, in one place.
 class MoneyText extends ConsumerWidget {
   const MoneyText(
     this.amount, {
@@ -25,16 +21,15 @@ class MoneyText extends ConsumerWidget {
   final Money amount;
   final TextStyle? style;
 
-  /// Green for inflows, red for outflows. Off by default: most amounts read
-  /// better in the normal text colour, with colour reserved for the places it
-  /// carries information.
+  /// Green for inflows, red for outflows. Off by default — colour is worth
+  /// more where it is scarce.
   final bool colorBySign;
 
   final bool forceSign;
   final bool compact;
   final bool showSymbol;
 
-  /// Prefix for the screen reader, e.g. "Balance".
+  /// Read out before the amount, e.g. "Balance".
   final String? semanticPrefix;
 
   @override

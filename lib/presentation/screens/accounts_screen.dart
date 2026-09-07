@@ -9,7 +9,6 @@ import '../theme.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/money_text.dart';
 
-/// Manage accounts: add, edit, archive, delete.
 class AccountsScreen extends ConsumerWidget {
   const AccountsScreen({super.key});
 

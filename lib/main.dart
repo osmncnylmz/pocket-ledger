@@ -12,8 +12,8 @@ import 'presentation/settings.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Both of these are cheap and local, and having them ready before the first
-  // frame means no screen ever has to render a "loading your settings" state.
+  // Both are cheap and local. Having them ready before the first frame means
+  // no screen ever has to render a "loading your settings" state.
   final preferences = await SharedPreferences.getInstance();
   final database = AppDatabase.open();
 

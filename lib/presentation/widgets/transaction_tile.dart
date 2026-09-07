@@ -5,7 +5,6 @@ import '../category_icons.dart';
 import '../theme.dart';
 import 'money_text.dart';
 
-/// One row of the ledger.
 class TransactionTile extends StatelessWidget {
   const TransactionTile({required this.detail, super.key, this.onTap});
 
@@ -70,7 +69,6 @@ class TransactionTile extends StatelessWidget {
   }
 }
 
-/// A sticky day header for the grouped ledger list.
 class DayHeader extends StatelessWidget {
   const DayHeader({required this.label, required this.total, super.key});
 

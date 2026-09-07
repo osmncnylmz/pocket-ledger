@@ -10,28 +10,26 @@ import 'package:meta/meta.dart';
 final class DateRange {
   const DateRange(this.start, this.end);
 
-  /// The calendar month containing [moment].
   factory DateRange.month(DateTime moment) {
     final start = DateTime(moment.year, moment.month);
     return DateRange(start, DateTime(moment.year, moment.month + 1));
   }
 
-  /// The ISO week (Monday to Sunday) containing [moment].
+  /// ISO weeks: Monday to Sunday.
   factory DateRange.week(DateTime moment) {
     final day = DateTime(moment.year, moment.month, moment.day);
     final start = day.subtract(Duration(days: day.weekday - DateTime.monday));
     return DateRange(start, DateTime(start.year, start.month, start.day + 7));
   }
 
-  /// The calendar year containing [moment].
   factory DateRange.year(DateTime moment) =>
       DateRange(DateTime(moment.year), DateTime(moment.year + 1));
 
   final DateTime start;
   final DateTime end;
 
-  /// The [count] calendar months ending with (and including) the month of
-  /// [moment], oldest first.
+  /// Oldest first, and the month of [moment] is the last one, not the one
+  /// before it.
   static List<DateRange> lastMonths(DateTime moment, int count) {
     assert(count > 0, 'count must be positive');
     return [
@@ -51,8 +49,8 @@ final class DateRange {
     return utcEnd.difference(utcStart).inDays;
   }
 
-  /// How many days of this range have already elapsed at [moment], clamped to
-  /// `1..days`. Used to work out whether spending is ahead of pace.
+  /// Days elapsed at [moment], clamped to `1..days`. Drives the "ahead of
+  /// pace" check on budgets.
   int elapsedDays(DateTime moment) {
     if (!moment.isAfter(start)) return 1;
     final utcStart = DateTime.utc(start.year, start.month, start.day);
@@ -74,6 +72,5 @@ final class DateRange {
       '${end.toIso8601String()})';
 }
 
-/// Midnight at the start of the day containing [moment].
 DateTime startOfDay(DateTime moment) =>
     DateTime(moment.year, moment.month, moment.day);

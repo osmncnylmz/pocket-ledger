@@ -2,11 +2,9 @@ import '../domain/entities.dart';
 import '../domain/money.dart';
 import 'database.dart';
 
-/// Translations from drift row classes into domain entities.
-///
 /// The dependency arrow points inward: `data` knows about `domain`, never the
-/// other way round. Nothing above this file ever sees a `*Row` type, which is
-/// what keeps the schema free to change without touching the UI.
+/// reverse. Nothing above this file ever sees a `*Row` type, which is what
+/// leaves the schema free to change without touching the UI.
 extension AccountRowMapper on AccountRow {
   Account toEntity() => Account(
     id: id,

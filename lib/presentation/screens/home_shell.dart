@@ -8,7 +8,6 @@ import 'dashboard_screen.dart';
 import 'settings_screen.dart';
 import 'transactions_screen.dart';
 
-/// The four top-level destinations, with the one action that matters on top.
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
@@ -47,8 +46,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     return Scaffold(
       body: AnimatedSwitcher(
         duration: Motion.of(context, Motion.quick),
-        // A short cross-fade with a touch of vertical travel: enough to signal
-        // a change of place without making the user wait for it.
+        // A cross-fade with a little vertical travel — enough to signal a
+        // change of place without making anyone wait for it.
         transitionBuilder: (child, animation) => FadeTransition(
           opacity: animation,
           child: SlideTransition(

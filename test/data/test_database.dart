@@ -2,11 +2,9 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:pocket_ledger/data/database.dart';
 
-/// An empty database backed by SQLite in memory.
-///
 /// `NativeDatabase.memory()` is the real SQLite engine, so every constraint,
-/// index and `CHECK` in the schema is exercised by the tests exactly as it will
-/// be on a device. Nothing here is a fake.
+/// index and `CHECK` in the schema is exercised exactly as it will be on a
+/// device. Nothing here is a fake.
 AppDatabase newTestDatabase({bool logStatements = false}) {
   // Each test database has its own private in-memory executor, so drift's
   // "you opened the database twice" warning does not apply here.
@@ -24,7 +22,6 @@ AppDatabase newTestDatabase({bool logStatements = false}) {
   );
 }
 
-/// Runs [body] against a fresh database and closes it afterwards.
 Future<T> withTestDatabase<T>(Future<T> Function(AppDatabase db) body) async {
   final db = newTestDatabase();
   try {

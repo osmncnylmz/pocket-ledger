@@ -40,9 +40,8 @@ class BudgetsScreen extends ConsumerWidget {
           icon: Icons.savings_outlined,
           title: 'No budgets yet',
           message:
-              'A budget is a limit on one category for one window. Set one and '
-              'this screen shows how far through it you are, and whether you '
-              'are spending faster than the calendar.',
+              'Set a limit on a category and this screen tracks it against the '
+              'calendar.',
           action: FilledButton.icon(
             onPressed: () => showBudgetEditor(context),
             icon: const Icon(Icons.add),

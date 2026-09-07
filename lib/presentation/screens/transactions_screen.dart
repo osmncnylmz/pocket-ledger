@@ -14,7 +14,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/money_text.dart';
 import '../widgets/transaction_tile.dart';
 
-/// The ledger: every entry, newest first, grouped by day.
+/// Every entry, newest first, grouped by day.
 class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
 
@@ -128,9 +128,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                             icon: Icons.receipt_long_outlined,
                             title: 'No transactions yet',
                             message:
-                                'Record what you spend and earn, and this list '
-                                'becomes the history everything else is built '
-                                'from.',
+                                'Income, expenses and transfers all land here.',
                             action: FilledButton.icon(
                               onPressed: () => showTransactionEditor(context),
                               icon: const Icon(Icons.add),
@@ -156,9 +154,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   )
                 else ...[
                   if (filter.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: _ResultSummary(page: data, filter: filter),
-                    ),
+                    SliverToBoxAdapter(child: _ResultSummary(page: data)),
                   ..._buildDayGroups(data),
                   SliverToBoxAdapter(
                     child: _ListFooter(
@@ -268,8 +264,8 @@ class _DayHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   Money get _net {
     final currency = entries.first.amount.currency;
-    // Transfers net to zero across the ledger but not within one account, so
-    // they are left out of the day total to keep it meaningful.
+    // A transfer nets to zero across the ledger but not within one account,
+    // so it stays out of the day total.
     return sumMoney(
       entries.where((e) => !e.entry.type.isTransfer).map((e) => e.amount),
       currency,
@@ -328,10 +324,9 @@ class _SearchField extends StatelessWidget {
 }
 
 class _ResultSummary extends ConsumerWidget {
-  const _ResultSummary({required this.page, required this.filter});
+  const _ResultSummary({required this.page});
 
   final LedgerPage page;
-  final Object filter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

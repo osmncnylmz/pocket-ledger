@@ -163,9 +163,7 @@ void main() {
     expect(find.text(r'$256.00'), findsNothing);
   });
 
-  testWidgets('an empty ledger explains itself instead of showing zeros', (
-    tester,
-  ) async {
+  testWidgets('an empty ledger shows empty states', (tester) async {
     await pumpScreen(tester, const DashboardScreen(), now: now);
 
     expect(find.text('No accounts yet'), findsOneWidget);
@@ -207,7 +205,7 @@ void main() {
     );
 
     // Motion.of collapses every duration to zero under reduced motion, so the
-    // chart is at its final state on the first frame rather than tweening to it.
+    // chart is already at its final state on the first frame.
     await tester.scrollUntilVisible(find.byType(DonutChart), 200);
     expect(find.byType(DonutChart), findsOneWidget);
   });

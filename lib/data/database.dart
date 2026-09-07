@@ -13,11 +13,9 @@ export 'tables.dart';
 
 part 'database.g.dart';
 
-/// The application database.
-///
-/// Everything the app knows lives here. There is no server, no sync engine and
-/// no cache to invalidate: SQLite *is* the source of truth, and drift's query
-/// streams are what keep the UI in step with it.
+/// Everything the app knows lives here. There is no server and no cache to
+/// invalidate — SQLite is the source of truth, and drift's query streams are
+/// what keep the UI in step with it.
 @DriftDatabase(
   tables: [Accounts, Categories, Transactions, Budgets],
   daos: [AccountsDao, CategoriesDao, TransactionsDao, BudgetsDao],
@@ -25,8 +23,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
-  /// Opens the on-device database file (`pocket_ledger.sqlite` in the
-  /// application documents directory).
+  /// `pocket_ledger.sqlite`, in the application documents directory.
   AppDatabase.open() : super(driftDatabase(name: 'pocket_ledger'));
 
   @override
@@ -45,16 +42,14 @@ class AppDatabase extends _$AppDatabase {
 
       await transaction(() async {
         if (from < 2) {
-          // v2 introduced archivable categories ...
           await m.addColumn(categories, categories.archived);
-          // ... budget periods. Existing budgets were implicitly monthly, and
-          // the column default backfills them. Rewriting the table also picks
-          // up the new UNIQUE(category_id, period) constraint, which a plain
-          // ADD COLUMN cannot express.
+          // Budgets get a period. Existing ones were implicitly monthly and
+          // the column default backfills them. This has to be a table rewrite
+          // rather than an ADD COLUMN: it is the only way to pick up the new
+          // UNIQUE(category_id, period) constraint.
           await m.alterTable(
             TableMigration(budgets, newColumns: [budgets.period]),
           );
-          // ... and an index for the "amount between" filter.
           await m.createIndex(idxTransactionsAbsAmount);
         }
       });

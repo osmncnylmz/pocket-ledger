@@ -9,7 +9,6 @@ import '../sheets/category_editor_sheet.dart';
 import '../theme.dart';
 import '../widgets/empty_state.dart';
 
-/// Manage the category tree.
 class CategoriesScreen extends ConsumerWidget {
   const CategoriesScreen({super.key});
 
@@ -59,9 +58,7 @@ class _CategoryList extends ConsumerWidget {
       AsyncData(value: final all) when all.isEmpty => EmptyState(
         icon: Icons.category_outlined,
         title: 'No ${kind.name} categories',
-        message:
-            'Categories are what turn a list of amounts into a picture of '
-            'where money goes.',
+        message: 'Nothing to break spending down by yet.',
         action: FilledButton.icon(
           onPressed: () => showCategoryEditor(context, kind: kind),
           icon: const Icon(Icons.add),

@@ -11,8 +11,8 @@ import '../mappers.dart';
 
 part 'transactions_dao.g.dart';
 
-/// A page of ledger entries plus the total number of matches, so the list can
-/// show "42 results" without a second round trip from the UI layer.
+/// A page of entries plus the total number of matches, so the list can say
+/// "42 results" without a second round trip.
 final class LedgerPage {
   const LedgerPage({required this.entries, required this.totalCount});
 
@@ -22,7 +22,6 @@ final class LedgerPage {
   bool get isEmpty => entries.isEmpty;
 }
 
-/// Everything that reads or writes ledger entries.
 @DriftAccessor(tables: [Accounts, Categories, Transactions])
 class TransactionsDao extends DatabaseAccessor<AppDatabase>
     with _$TransactionsDaoMixin {
@@ -65,11 +64,8 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Translates a [TransactionFilter] into one `WHERE` clause.
-  ///
-  /// Every predicate below runs inside SQLite. Nothing is post-filtered in
-  /// Dart, which is what lets the list stay on an index instead of reading the
-  /// table.
+  /// One `WHERE` clause for the whole filter. Nothing is post-filtered in
+  /// Dart, which is what keeps the list on an index.
   Expression<bool> _predicate(TransactionFilter filter) {
     final clauses = <Expression<bool>>[];
 
@@ -77,6 +73,9 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     if (text.isNotEmpty) {
       // `instr` rather than `LIKE` so that a user typing `50%` searches for the
       // literal characters instead of accidentally writing a wildcard.
+      // TODO: no index serves this; it scans whatever the date range leaves.
+      // FTS5 over note/category/account if a ledger ever gets big enough to
+      // feel it.
       clauses.add(
         _containsIgnoringCase(transactions.note, text) |
             _containsIgnoringCase(categories.name, text) |
@@ -129,8 +128,7 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     ]).isBiggerThanValue(0);
   }
 
-  /// One page of the ledger, newest first, with its accounts and categories
-  /// already joined in.
+  /// Newest first, with accounts and categories already joined in.
   Stream<LedgerPage> watchPage({
     TransactionFilter filter = TransactionFilter.empty,
     int limit = 50,
@@ -178,10 +176,9 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     return row == null ? null : _readDetail(row);
   }
 
-  /// Spending per category over [range], biggest first.
-  ///
-  /// Transfers are excluded on purpose: moving money between your own accounts
-  /// is not spending, and counting it would double every savings deposit.
+  /// Biggest first. Transfers are excluded on purpose: moving money between
+  /// your own accounts is not spending, and counting it would double every
+  /// savings deposit.
   Stream<List<CategorySpend>> watchCategorySpend(
     DateRange range, {
     required Currency currency,
@@ -224,9 +221,9 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Income and expense per calendar month for the [months] months ending with
-  /// the month containing [endingIn], oldest first. Months with no activity are
-  /// filled in with zeros so the trend line has no gaps.
+  /// The [months] calendar months ending with the one containing [endingIn],
+  /// oldest first. Months with no activity come back as zeros, so the trend
+  /// line has no gaps in it.
   Stream<List<MonthlyTotals>> watchMonthlyTotals({
     required DateTime endingIn,
     required int months,
@@ -282,11 +279,9 @@ ORDER BY month
       '${month.year.toString().padLeft(4, '0')}-'
       '${month.month.toString().padLeft(2, '0')}';
 
-  /// Records an income or expense.
-  ///
-  /// [amount] is a magnitude; the sign is applied here from [type] so that the
-  /// caller can never post an expense that increases a balance. The `CHECK`
-  /// constraint in the schema is the second line of defence.
+  /// [amount] is a magnitude. The sign comes from [type] and is applied here,
+  /// so a caller cannot post an expense that increases a balance; the schema's
+  /// `CHECK` is the second line of defence.
   Future<int> createEntry({
     required int accountId,
     required int? categoryId,
@@ -335,10 +330,9 @@ ORDER BY month
     return type == TransactionType.expense ? -magnitude : magnitude;
   }
 
-  /// Posts a transfer as two mirrored entries that point at each other.
-  ///
-  /// Returns the id of the outgoing leg. The whole thing runs in one SQL
-  /// transaction, so there is no window in which a half-transfer exists.
+  /// Two mirrored entries pointing at each other; returns the outgoing leg.
+  /// One SQL transaction, so there is no window in which half a transfer
+  /// exists.
   Future<int> createTransfer(TransferDraft draft) {
     final problems = draft.validate();
     if (problems.isNotEmpty) {
@@ -372,8 +366,6 @@ ORDER BY month
     });
   }
 
-  /// Rewrites both legs of an existing transfer from [draft].
-  ///
   /// [legId] may be either leg; the sibling is found through `counterpart_id`.
   Future<void> updateTransfer(int legId, TransferDraft draft) {
     final problems = draft.validate();
@@ -413,10 +405,8 @@ ORDER BY month
     });
   }
 
-  /// Deletes an entry, taking the far leg of a transfer with it.
-  ///
-  /// Returns the rows that were removed so the caller can offer undo without
-  /// having to re-derive them.
+  /// Takes the far leg of a transfer with it, and returns the rows it removed
+  /// so the caller can offer undo without re-deriving them.
   Future<List<TransactionRow>> deleteEntry(int id) {
     return transaction(() async {
       final row = await (select(
@@ -439,10 +429,12 @@ ORDER BY month
     });
   }
 
-  /// Puts previously deleted rows back, ids and transfer links included.
+  /// Puts deleted rows back with their original ids and transfer links.
   Future<void> restoreEntries(List<TransactionRow> rows) {
     if (rows.isEmpty) return Future.value();
     return transaction(() async {
+      // Two passes: each leg of a transfer references the other, so neither
+      // can carry its counterpart_id until both rows exist again.
       for (final row in rows) {
         await into(transactions)
             .insert(row.copyWith(counterpartId: const Value(null)));
@@ -456,7 +448,6 @@ ORDER BY month
     });
   }
 
-  /// Total number of entries, used by the empty states and the settings screen.
   Future<int> countAll() {
     final counter = transactions.id.count();
     return (selectOnly(

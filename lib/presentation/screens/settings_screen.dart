@@ -20,7 +20,7 @@ final backupFileStoreProvider = Provider<BackupFileStore>(
   (ref) => const BackupFileStore(),
 );
 
-/// Preferences, the data the app is holding, and the way to get it out.
+/// Preferences, plus the ways data gets in and out of the app.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -175,8 +175,8 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
         final file = await ref.read(backupFileStoreProvider).write(json);
         path = file.path;
       } on Object {
-        // No writable documents directory (a plain test host, for example).
-        // The clipboard copy above still gives the user their data.
+        // No writable documents directory — a plain test host, say. The
+        // clipboard copy above still hands the user their data.
         path = null;
       }
 

@@ -11,7 +11,6 @@ import '../providers.dart';
 import '../theme.dart';
 import '../widgets/amount_field.dart';
 
-/// Opens the filter sheet for the transactions list.
 Future<void> showFilterSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
@@ -21,8 +20,8 @@ Future<void> showFilterSheet(BuildContext context) {
   );
 }
 
-/// Builds a [TransactionFilter]. Every control here maps onto a `WHERE`
-/// clause; nothing is filtered after the query comes back.
+/// Every control here maps onto a `WHERE` clause. Nothing is filtered after
+/// the query comes back.
 class FilterSheet extends ConsumerStatefulWidget {
   const FilterSheet({super.key});
 

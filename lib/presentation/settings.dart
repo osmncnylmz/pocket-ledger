@@ -4,18 +4,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../domain/enums.dart';
 import '../domain/money.dart';
 
-/// User preferences that are not ledger data.
-///
-/// These live in `SharedPreferences` rather than SQLite on purpose: they are
-/// per-device (which theme this phone uses), so they must *not* travel in a
-/// backup that gets restored onto another device.
+/// These live in `SharedPreferences`, not the database. They are per-device
+/// — which theme this phone uses — so they must *not* travel inside a backup
+/// that gets restored onto some other device.
 class Settings {
   const Settings({required this.themeMode, required this.currency});
 
   final AppThemeMode themeMode;
 
-  /// The currency new accounts are created in and that the dashboard
-  /// aggregates over.
+  /// New accounts are created in this, and the dashboard aggregates over it.
   final Currency currency;
 
   static const defaults = Settings(
@@ -38,11 +35,7 @@ class Settings {
   int get hashCode => Object.hash(themeMode, currency);
 }
 
-/// Provides the `SharedPreferences` instance.
-///
-/// It is loaded once in `main` and injected with a `ProviderScope` override,
-/// which keeps every consumer synchronous and lets widget tests hand in mock
-/// values. Reading it without an override is a wiring mistake, so it says so.
+/// Same override trick as `databaseProvider`; tests hand in a mock instance.
 final sharedPreferencesProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError(
     'sharedPreferencesProvider must be overridden with a loaded instance',
@@ -52,7 +45,6 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
 const _themeModeKey = 'settings.themeMode';
 const _currencyKey = 'settings.currencyCode';
 
-/// Reads and writes [Settings], persisting every change immediately.
 class SettingsController extends Notifier<Settings> {
   @override
   Settings build() {

@@ -5,8 +5,8 @@ import '../category_icons.dart';
 import '../theme.dart';
 import 'money_text.dart';
 
-/// A budget with an animated progress bar and a marker showing where an evenly
-/// paced spender would be today.
+/// The bar carries a second marker: where an evenly paced spender would be
+/// today.
 class BudgetTile extends StatelessWidget {
   const BudgetTile({
     required this.progress,
@@ -81,8 +81,8 @@ class BudgetTile extends StatelessWidget {
             Row(
               children: [
                 // The status keeps its natural width and the amounts give way
-                // to it, so a long category currency or a large limit narrows
-                // the figures rather than pushing the status off the tile.
+                // to it. A large limit narrows the figures; "Over budget"
+                // never gets pushed off the edge of the tile.
                 Expanded(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

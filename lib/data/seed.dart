@@ -6,7 +6,6 @@ import '../domain/money.dart';
 import '../domain/services/transfer.dart';
 import 'database.dart';
 
-/// A default category as shipped with a fresh install.
 typedef _SeedCategory = ({
   String name,
   String iconKey,
@@ -101,8 +100,8 @@ const _defaultCategories = <_SeedCategory>[
   ),
 ];
 
-/// Writes the shipped category list. Exposed separately so the sample-data
-/// loader can rebuild it after wiping the ledger.
+/// Separate from [seedDefaults] so the sample-data loader can rebuild the
+/// list after wiping the ledger.
 Future<void> insertDefaultCategories(AppDatabase db) {
   return db.batch((batch) {
     batch.insertAll(db.categories, [
@@ -117,10 +116,7 @@ Future<void> insertDefaultCategories(AppDatabase db) {
   });
 }
 
-/// Fills a brand new database with the default categories and two accounts.
-///
-/// Idempotent: it does nothing if any category already exists, so it is safe to
-/// call on every launch.
+/// Runs on every launch, and does nothing once a single category exists.
 Future<void> seedDefaults(AppDatabase db, {required Currency currency}) async {
   final existing = await db.categoriesDao.allCategories(includeArchived: true);
   if (existing.isNotEmpty) return;
@@ -146,11 +142,9 @@ Future<void> seedDefaults(AppDatabase db, {required Currency currency}) async {
   });
 }
 
-/// Replaces the ledger with six months of plausible sample data.
-///
-/// This exists so that a fresh install has something to show in the charts and
-/// so that screenshots are not of empty states. It is deterministic — the same
-/// seed produces the same ledger — which also makes it usable in tests.
+/// Replaces the ledger with six months of plausible sample data, so a fresh
+/// install has something to show in the charts. Deterministic: the same
+/// [randomSeed] gives the same ledger, which makes it usable in tests too.
 Future<void> loadSampleData(
   AppDatabase db, {
   required Currency currency,
@@ -219,7 +213,6 @@ Future<void> loadSampleData(
         note: 'Monthly salary',
       );
 
-      // Rent on the 1st.
       await db.transactionsDao.createEntry(
         accountId: everyday,
         categoryId: categoryId('Rent'),
@@ -229,7 +222,6 @@ Future<void> loadSampleData(
         note: 'Rent',
       );
 
-      // Utilities and subscriptions.
       await db.transactionsDao.createEntry(
         accountId: everyday,
         categoryId: categoryId('Utilities'),
@@ -287,7 +279,7 @@ Future<void> loadSampleData(
       }
     }
 
-    // A few budgets to make the budgets screen meaningful.
+    // Enough budgets that the budgets screen has something to show.
     await db.budgetsDao.setLimit(
       categoryId: categoryId('Groceries'),
       period: BudgetPeriod.monthly,

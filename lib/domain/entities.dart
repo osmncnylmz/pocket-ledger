@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import 'enums.dart';
 import 'money.dart';
 
-/// A place money sits: a wallet, a current account, a credit card.
+/// Where money sits. The currency comes from the opening balance.
 @immutable
 final class Account {
   const Account({
@@ -23,8 +23,8 @@ final class Account {
   /// Balance the account already had when it was added to the ledger.
   final Money openingBalance;
 
-  /// Opaque 32 bit ARGB value. The domain does not depend on Flutter, so the
-  /// colour stays an integer until the presentation layer wraps it.
+  /// 32 bit ARGB. The domain does not import Flutter, so the colour stays an
+  /// integer until the presentation layer wraps it.
   final int colorValue;
 
   final bool archived;
@@ -33,7 +33,6 @@ final class Account {
   Currency get currency => openingBalance.currency;
 }
 
-/// An account plus its derived balance.
 @immutable
 final class AccountBalance {
   const AccountBalance({required this.account, required this.balance});
@@ -44,7 +43,7 @@ final class AccountBalance {
   final Money balance;
 }
 
-/// A spending or income bucket. Categories may nest one level via [parentId].
+/// A spending or income bucket. Nests one level deep, no further.
 @immutable
 final class Category {
   const Category({
@@ -60,9 +59,8 @@ final class Category {
   final int id;
   final String name;
 
-  /// Stable key into the app's icon table. Storing a key rather than a raw
-  /// `IconData` code point keeps Flutter's icon tree-shaking working: every
-  /// icon the app can show is referenced as a `const` in Dart source.
+  /// Stable key into the app's icon table. See `category_icons.dart` for why
+  /// it is a key and not a code point.
   final String iconKey;
 
   final int colorValue;
@@ -75,8 +73,8 @@ final class Category {
 
 /// One posted line of the ledger.
 ///
-/// [amount] is signed: negative means money left [accountId]. Transfers are
-/// stored as two entries pointing at each other through [counterpartId].
+/// [amount] is signed: negative means money left [accountId]. A transfer is
+/// two of these, pointing at each other through [counterpartId].
 @immutable
 final class LedgerEntry {
   const LedgerEntry({
@@ -98,14 +96,12 @@ final class LedgerEntry {
   final String note;
   final TransactionType type;
 
-  /// The other leg of a transfer, if this entry is one.
   final int? counterpartId;
 
   bool get isOutflow => amount.isNegative;
 }
 
-/// A ledger entry joined with the account and category it points at, which is
-/// what every list in the app actually needs.
+/// An entry with the account, category and counterpart rows it points at.
 @immutable
 final class LedgerEntryDetail {
   const LedgerEntryDetail({
@@ -119,14 +115,12 @@ final class LedgerEntryDetail {
   final Account account;
   final Category? category;
 
-  /// For a transfer, the account on the other side.
   final Account? counterpartAccount;
 
   int get id => entry.id;
   Money get amount => entry.amount;
   DateTime get date => entry.date;
 
-  /// What to show as the entry's headline.
   String get title {
     if (entry.type.isTransfer) {
       final other = counterpartAccount?.name ?? 'another account';
@@ -137,7 +131,6 @@ final class LedgerEntryDetail {
   }
 }
 
-/// A per-category limit for a recurring window.
 @immutable
 final class Budget {
   const Budget({
@@ -153,7 +146,6 @@ final class Budget {
   final Money limit;
 }
 
-/// Total spending in one category over some window, produced by a `GROUP BY`.
 @immutable
 final class CategorySpend {
   const CategorySpend({
@@ -169,7 +161,6 @@ final class CategorySpend {
   final int entryCount;
 }
 
-/// Income and expense totals for one calendar month.
 @immutable
 final class MonthlyTotals {
   const MonthlyTotals({
@@ -178,13 +169,11 @@ final class MonthlyTotals {
     required this.expense,
   });
 
-  /// First instant of the month these totals describe.
+  /// First instant of the month, not an arbitrary date inside it.
   final DateTime month;
 
-  /// Positive magnitude of money received.
+  /// Both are positive magnitudes, unlike the signed rows they came from.
   final Money income;
-
-  /// Positive magnitude of money spent.
   final Money expense;
 
   Money get net => income - expense;

@@ -33,7 +33,7 @@ void main() {
       period: BudgetPeriod.monthly,
       limit: Money.major(600, Currency.usd),
     );
-    // Setting it again updates rather than duplicating.
+    // Setting it again updates the same row.
     await db.budgetsDao.setLimit(
       categoryId: groceries.id,
       period: BudgetPeriod.monthly,

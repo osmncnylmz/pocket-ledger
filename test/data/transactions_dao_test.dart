@@ -487,7 +487,7 @@ void main() {
       );
     });
 
-    test('the page reports the total match count, not the page size', () async {
+    test('the page carries the total match count', () async {
       final page = await db.transactionsDao.watchPage(limit: 2).first;
       expect(page.entries, hasLength(2));
       expect(page.totalCount, 4);

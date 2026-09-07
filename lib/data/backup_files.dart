@@ -3,17 +3,13 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-/// Where exported backups are kept on disk.
-///
-/// A local-first app has no server to restore from, so the export has to land
-/// somewhere the user can actually reach: a plain, readable `.json` file in the
-/// app's documents directory that a file manager, a sync folder or a cable can
-/// pick up.
+/// There is no server to restore from, so the export has to land somewhere the
+/// user can actually reach: a readable `.json` file in the app's documents
+/// directory, which a file manager or a sync folder can pick up.
 class BackupFileStore {
   const BackupFileStore({this.directoryOverride});
 
-  /// Used by tests to point the store at a temporary directory instead of the
-  /// platform's documents directory.
+  /// Tests point this at a temporary directory.
   final Directory? directoryOverride;
 
   static const folderName = 'backups';
@@ -25,7 +21,7 @@ class BackupFileStore {
     return folder;
   }
 
-  /// Writes [json] to a timestamped file and returns it.
+  /// The timestamp is the filename, which is also what [list] sorts on.
   Future<File> write(String json, {DateTime? now}) async {
     final folder = await directory();
     final stamp = (now ?? DateTime.now())

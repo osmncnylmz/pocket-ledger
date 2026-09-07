@@ -9,12 +9,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/test_database.dart';
 
-/// A phone-sized surface, so the widget tests exercise the layout the app is
-/// actually designed for rather than the 800x600 default.
+/// A phone-sized surface. The 800x600 default lays the dashboard out in a
+/// way no user ever sees.
 const testSurface = Size(420, 900);
 
-/// Mounts [child] with an in-memory database and mock preferences.
-///
 /// Returns the database so a test can keep writing to it and watch the UI
 /// react through the same drift streams the real app uses.
 Future<AppDatabase> pumpScreen(

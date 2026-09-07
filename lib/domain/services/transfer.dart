@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 import '../entities.dart';
 import '../money.dart';
 
-/// Why a proposed transfer cannot be posted.
 enum TransferProblem {
   sameAccount,
   nonPositiveAmount,
@@ -13,8 +12,8 @@ enum TransferProblem {
 
 /// A transfer the user has described but that has not been written yet.
 ///
-/// Validation lives here rather than in the DAO so that the editor sheet can
-/// disable its save button using exactly the rule the database will enforce.
+/// The editor sheet needs the same rule the database enforces, so the rule
+/// lives in the domain and both sides call it.
 @immutable
 final class TransferDraft {
   const TransferDraft({
@@ -34,7 +33,8 @@ final class TransferDraft {
   final DateTime date;
   final String note;
 
-  /// Empty when the transfer is postable.
+  /// Empty when the transfer is postable. Callers show every problem at once;
+  /// fixing them one at a time is miserable.
   List<TransferProblem> validate() {
     return [
       if (from.id == to.id) TransferProblem.sameAccount,
@@ -48,7 +48,6 @@ final class TransferDraft {
   bool get isValid => validate().isEmpty;
 }
 
-/// Human-readable explanation of a [TransferProblem].
 String describeTransferProblem(TransferProblem problem) => switch (problem) {
   TransferProblem.sameAccount => 'Pick two different accounts.',
   TransferProblem.nonPositiveAmount => 'Enter an amount greater than zero.',

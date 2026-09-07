@@ -6,7 +6,6 @@ import 'screens/home_shell.dart';
 import 'settings.dart';
 import 'theme.dart';
 
-/// The application root.
 class PocketLedgerApp extends ConsumerWidget {
   const PocketLedgerApp({super.key});
 

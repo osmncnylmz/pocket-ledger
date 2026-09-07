@@ -7,8 +7,8 @@ import 'enums.dart';
 ///
 /// Every field here is translated into SQL by `TransactionsDao`; nothing is
 /// filtered in Dart. That matters once the ledger has tens of thousands of
-/// rows: the database reads an index range instead of the app reading the
-/// whole table.
+/// rows: the database reads an index range and the app never sees the rest
+/// of the table.
 @immutable
 final class TransactionFilter {
   const TransactionFilter({
@@ -21,11 +21,9 @@ final class TransactionFilter {
     this.maxAmountMinor,
   });
 
-  /// Free text, matched against the note, the category name and the account
-  /// name.
+  /// Matched against the note, the category name and the account name.
   final String text;
 
-  /// Half-open date interval.
   final DateRange? range;
 
   final Set<int> accountIds;

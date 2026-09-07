@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Colours that carry meaning rather than brand: money in, money out, and the
-/// two levels of budget trouble.
-///
-/// They live in a [ThemeExtension] so that both themes define them explicitly
-/// and no widget has to guess a shade from the brightness.
+/// Colours that mean something: money in, money out, and the two levels of
+/// budget trouble. A [ThemeExtension] so both themes have to define them
+/// explicitly and no widget guesses a shade from the brightness.
 @immutable
 class LedgerColors extends ThemeExtension<LedgerColors> {
   const LedgerColors({
@@ -89,15 +87,14 @@ class LedgerColors extends ThemeExtension<LedgerColors> {
   }
 }
 
-/// Convenience access to [LedgerColors] and the colour scheme.
 extension LedgerTheme on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
   TextTheme get texts => Theme.of(this).textTheme;
   LedgerColors get ledgerColors => Theme.of(this).extension<LedgerColors>()!;
 }
 
-/// The palette used for category slices when a category has no colour of its
-/// own. Ordered so that adjacent slices stay distinguishable.
+/// For category slices where the category has no colour of its own. Ordered
+/// so adjacent slices stay distinguishable.
 const categoryFallbackPalette = <Color>[
   Color(0xFF3F7D6E),
   Color(0xFFB4693C),
@@ -109,9 +106,8 @@ const categoryFallbackPalette = <Color>[
   Color(0xFF5C6BC0),
 ];
 
-/// A single seed drives the whole scheme; everything else is Material 3 doing
-/// its job. Both brightnesses are built from it so the two themes cannot drift
-/// apart.
+/// One seed drives the whole scheme; everything else is Material 3 doing its
+/// job. Both brightnesses come from it, so the two themes cannot drift apart.
 const _seedColor = Color(0xFF15695B);
 
 ThemeData buildAppTheme(Brightness brightness) {
@@ -198,8 +194,8 @@ ThemeData buildAppTheme(Brightness brightness) {
   );
 }
 
-/// Slightly tighter headings, and lining/tabular figures everywhere numbers
-/// appear so columns of money line up.
+/// Tighter headings, and tabular figures anywhere a number can appear so that
+/// columns of money line up.
 TextTheme _tuneTypography(TextTheme base) {
   const tabular = [FontFeature.tabularFigures()];
   return base.copyWith(
@@ -224,8 +220,7 @@ TextTheme _tuneTypography(TextTheme base) {
   );
 }
 
-/// Standard spacing steps. Using these instead of ad hoc numbers is what keeps
-/// the vertical rhythm consistent across screens.
+/// Spacing steps. Ad hoc numbers drift.
 abstract final class Insets {
   static const xs = 4.0;
   static const sm = 8.0;
@@ -235,7 +230,7 @@ abstract final class Insets {
   static const xxl = 32.0;
 }
 
-/// Motion durations, all in one place so "make it snappier" is one edit.
+/// All in one place so "make it snappier" is one edit.
 abstract final class Motion {
   static const quick = Duration(milliseconds: 180);
   static const normal = Duration(milliseconds: 320);

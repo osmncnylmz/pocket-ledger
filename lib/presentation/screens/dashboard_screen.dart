@@ -15,12 +15,11 @@ import '../widgets/money_text.dart';
 import '../widgets/section_card.dart';
 import '../widgets/trend_chart.dart';
 
-/// The dashboard: where the money is, where it went this month, and whether
-/// that is a problem.
+/// Balances, this month's totals, spending by category, a six-month trend
+/// and the budgets closest to their limit. Every figure follows the month
+/// picker in the header.
 class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({super.key, this.onSeeAllBudgets});
-
-  final VoidCallback? onSeeAllBudgets;
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,8 +36,8 @@ class DashboardScreen extends ConsumerWidget {
             ],
           ),
           SliverPadding(
-            // Clears the extended FAB (56dp tall plus its 16dp margin) so the
-            // last card is fully readable at the bottom of the scroll.
+            // Clears the extended FAB: 56dp tall plus its 16dp margin, so the
+            // last card is still readable at the bottom of the scroll.
             padding: const EdgeInsets.fromLTRB(Insets.lg, 0, Insets.lg, 88),
             sliver: SliverList.list(
               children: const [
@@ -676,7 +675,7 @@ class _BudgetsPreviewCard extends ConsumerWidget {
     );
   }
 
-  /// The three budgets most worth looking at: the ones furthest along.
+  /// The three furthest through their limit.
   static List<BudgetProgress> _mostUrgent(List<BudgetProgress> all) {
     final sorted = [...all]
       ..sort((a, b) => b.percentUsed.compareTo(a.percentUsed));

@@ -1,9 +1,6 @@
-# Lint configuration for pocket_ledger.
-#
-# `flutter_lints` is the baseline. The extra rules below are the ones that
-# actually caught something while this app was being written: they push toward
-# const constructors, explicit types on public API, and the small correctness
-# traps around async gaps and BuildContext.
+# `flutter_lints` is the baseline. Everything added below caught something real
+# while this app was being written — mostly missing const constructors, and the
+# correctness traps around async gaps and BuildContext.
 include: package:flutter_lints/flutter.yaml
 
 analyzer:

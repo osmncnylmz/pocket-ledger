@@ -95,7 +95,7 @@ final class MoneyFormatter {
     return text;
   }
 
-  /// Inserts the grouping separator every three digits from the right.
+  /// Groups from the right, three at a time.
   String _group(String digits) {
     if (digits.length <= 3) return digits;
     final buffer = StringBuffer();

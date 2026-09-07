@@ -11,7 +11,6 @@ import '../theme.dart';
 import '../widgets/amount_field.dart';
 import '../widgets/empty_state.dart';
 
-/// Opens the add/edit sheet. Pass [existing] to edit.
 Future<void> showTransactionEditor(
   BuildContext context, {
   LedgerEntryDetail? existing,
@@ -24,7 +23,7 @@ Future<void> showTransactionEditor(
   );
 }
 
-/// The one place transactions are created and edited.
+/// Bottom sheet for creating or editing one transaction, transfers included.
 class TransactionEditorSheet extends ConsumerStatefulWidget {
   const TransactionEditorSheet({super.key, this.existing});
 
@@ -63,7 +62,8 @@ class _TransactionEditorSheetState
     _noteController = TextEditingController(text: existing?.entry.note ?? '');
 
     if (existing != null && existing.entry.type.isTransfer) {
-      // Always show a transfer as "from → to", whichever leg was tapped.
+      // Show a transfer as "from → to" whichever leg was tapped, or editing
+      // the incoming side would silently reverse it.
       if (existing.entry.isOutflow) {
         _accountId = existing.account.id;
         _destinationAccountId = existing.counterpartAccount?.id;

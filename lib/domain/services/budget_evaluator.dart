@@ -16,7 +16,6 @@ enum BudgetHealth {
   overBudget,
 }
 
-/// A budget with the spending measured against it.
 @immutable
 final class BudgetProgress {
   const BudgetProgress({
@@ -34,7 +33,8 @@ final class BudgetProgress {
   /// Positive magnitude spent inside [window].
   final Money spent;
 
-  /// The concrete date interval the limit was measured over.
+  /// The concrete interval the limit was measured over — the week, month or
+  /// year that contained "now" when the query ran.
   final DateRange window;
 
   final BudgetHealth health;
@@ -47,25 +47,21 @@ final class BudgetProgress {
 
   Money get remaining => budget.limit - spent;
 
-  /// Fraction of the limit consumed, clamped to `0..1` for rendering. The
-  /// unclamped number is available as [percentUsed].
+  /// Clamped to `0..1` for the progress bar; [percentUsed] is the honest
+  /// number and can go past 100.
   double get fractionUsed {
     if (budget.limit.minorUnits <= 0) return 0;
     final ratio = spent.minorUnits / budget.limit.minorUnits;
     return ratio.clamp(0.0, 1.0);
   }
 
-  /// Percentage of the limit consumed, computed with integer arithmetic and
-  /// therefore exact. Can exceed 100.
   int get percentUsed => spent.percentOf(budget.limit);
 
   bool get isOverBudget => health == BudgetHealth.overBudget;
 }
 
-/// Turns a raw `(budget, category, spent)` triple into a [BudgetProgress].
-///
-/// Kept as a free function in the domain so the rule "over budget means spent
-/// >= limit, ahead of pace means you are outspending the calendar" is testable
+/// A free function, not a method, so the rule — over budget means spent >=
+/// limit, ahead of pace means you are outspending the calendar — is testable
 /// without a database or a widget tree.
 BudgetProgress evaluateBudget({
   required Budget budget,
@@ -78,7 +74,8 @@ BudgetProgress evaluateBudget({
   final elapsed = window.elapsedDays(now);
   final totalDays = window.days;
 
-  // Integer maths: limit * elapsed / totalDays, truncated. No doubles.
+  // limit * elapsed / totalDays, truncated. Multiply before dividing or a
+  // small limit rounds to nothing early in the window.
   final expectedMinor = totalDays <= 0
       ? limit.minorUnits
       : limit.minorUnits * elapsed ~/ totalDays;

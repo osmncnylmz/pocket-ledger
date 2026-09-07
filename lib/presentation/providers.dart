@@ -12,19 +12,17 @@ import '../domain/services/budget_evaluator.dart';
 import '../domain/transaction_filter.dart';
 import 'settings.dart';
 
-/// The open database.
-///
 /// Opened once in `main` and injected through a `ProviderScope` override, so
-/// tests can hand in an in-memory one. Reading it without an override is a
-/// wiring mistake, so it says so rather than silently opening a file.
+/// tests can hand in an in-memory one. Unoverridden it throws; a test that
+/// quietly opened a file on disk would be worse than one that failed.
 final databaseProvider = Provider<AppDatabase>(
   (ref) => throw UnimplementedError(
     'databaseProvider must be overridden with an open AppDatabase',
   ),
 );
 
-/// "Now", as a provider, so that screens are deterministic under test and the
-/// dashboard can be pinned to a fixed date in a widget test.
+/// "Now" as a provider, so a widget test can pin the dashboard to a fixed
+/// date and not race the clock.
 final nowProvider = Provider<DateTime>((ref) => DateTime.now());
 
 final moneyFormatterProvider = Provider<MoneyFormatter>(
@@ -35,7 +33,6 @@ final backupServiceProvider = Provider<BackupService>(
   (ref) => BackupService(ref.watch(databaseProvider)),
 );
 
-/// The currency every aggregate on the dashboard is denominated in.
 final activeCurrencyProvider = Provider<Currency>(
   (ref) => ref.watch(settingsProvider).currency,
 );
@@ -60,8 +57,6 @@ final categoriesProvider = StreamProvider.family<List<Category>, CategoryKind?>(
       ref.watch(databaseProvider).categoriesDao.watchCategories(kind: kind),
 );
 
-/// The month the dashboard is looking at. Defaults to the current one and can
-/// be stepped backwards and forwards.
 class SelectedMonth extends Notifier<DateTime> {
   @override
   DateTime build() {
@@ -94,7 +89,6 @@ final monthlySpendProvider = StreamProvider<List<CategorySpend>>((ref) {
       );
 });
 
-/// Six months of income and expense, ending with the selected month.
 final trendProvider = StreamProvider<List<MonthlyTotals>>((ref) {
   return ref
       .watch(databaseProvider)
@@ -109,8 +103,8 @@ final trendProvider = StreamProvider<List<MonthlyTotals>>((ref) {
 final budgetProgressProvider = StreamProvider<List<BudgetProgress>>((ref) {
   final month = ref.watch(selectedMonthProvider);
   final now = ref.watch(nowProvider);
-  // When looking at a past month, evaluate the pace at its end rather than
-  // pretending today's date applies to it.
+  // A past month is paced from its own end; today's date says nothing about
+  // how far through March you were.
   final asOf =
       DateTime(month.year, month.month) == DateTime(now.year, now.month)
       ? now
@@ -122,7 +116,8 @@ final budgetProgressProvider = StreamProvider<List<BudgetProgress>>((ref) {
       .watchProgress(now: asOf, currency: ref.watch(activeCurrencyProvider));
 });
 
-/// Only the budgets for the month, which is what the dashboard summarises.
+/// Monthly budgets only; weekly and yearly ones would not add up against a
+/// month's spending.
 final monthlyBudgetProgressProvider =
     Provider<AsyncValue<List<BudgetProgress>>>(
       (ref) => ref
@@ -134,7 +129,6 @@ final monthlyBudgetProgressProvider =
           ),
     );
 
-/// The filter the transactions screen is applying.
 class TransactionFilterController extends Notifier<TransactionFilter> {
   @override
   TransactionFilter build() => TransactionFilter.empty;
@@ -151,11 +145,9 @@ final transactionFilterProvider =
       TransactionFilterController.new,
     );
 
-/// How many rows the transactions list is currently asking for.
-///
-/// Paging is done by widening the SQL `LIMIT` as the user reaches the end of
-/// the list. The query stays a single indexed read; nothing is accumulated in
-/// Dart, so a change to any visible row still arrives through the stream.
+/// Paging widens the SQL `LIMIT` as the user reaches the end of the list.
+/// Nothing accumulates in Dart, so the query stays one indexed read and an
+/// edit to any visible row still arrives through the stream.
 class VisibleRowCount extends Notifier<int> {
   static const pageSize = 40;
 
@@ -183,10 +175,8 @@ final ledgerPageProvider = StreamProvider<LedgerPage>((ref) {
       );
 });
 
-/// Total number of entries in the ledger, ignoring the current filter.
-///
-/// Asks for a single row and reads the count that comes back with it, so this
-/// is a `COUNT(*)` rather than a table read.
+/// Every entry, filter ignored. Asks for a single row and reads the count that
+/// rides along with it, so it costs a `COUNT(*)` and not a table read.
 final ledgerCountProvider = StreamProvider<int>((ref) {
   return ref
       .watch(databaseProvider)
@@ -195,8 +185,8 @@ final ledgerCountProvider = StreamProvider<int>((ref) {
       .map((page) => page.totalCount);
 });
 
-/// Drives the difference between "no transactions yet" and "nothing matches
-/// your filter", which need different empty states.
+/// Separates "no transactions yet" from "nothing matches your filter". They
+/// want different empty states.
 final ledgerIsEmptyProvider = Provider<AsyncValue<bool>>(
   (ref) => ref.watch(ledgerCountProvider).whenData((count) => count == 0),
 );

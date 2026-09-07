@@ -7,7 +7,6 @@ import '../mappers.dart';
 
 part 'categories_dao.g.dart';
 
-/// Queries over the category tree.
 @DriftAccessor(tables: [Categories])
 class CategoriesDao extends DatabaseAccessor<AppDatabase>
     with _$CategoriesDaoMixin {
@@ -103,9 +102,8 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Removes a category. Entries that referenced it become uncategorised
-  /// (`ON DELETE SET NULL`) rather than disappearing, and any budget for it is
-  /// cascaded away.
+  /// Entries that referenced it become uncategorised (`ON DELETE SET NULL`)
+  /// and stay in the ledger; a budget on it is cascaded away.
   Future<void> deleteCategory(int id) {
     return (delete(categories)..where((c) => c.id.equals(id))).go();
   }

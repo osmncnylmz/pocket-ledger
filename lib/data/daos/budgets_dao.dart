@@ -9,18 +9,16 @@ import '../database.dart';
 
 part 'budgets_dao.g.dart';
 
-/// Budgets and the spending measured against them.
 @DriftAccessor(tables: [Budgets, Categories, Transactions, Accounts])
 class BudgetsDao extends DatabaseAccessor<AppDatabase> with _$BudgetsDaoMixin {
   BudgetsDao(super.db);
 
-  /// Every budget with the amount spent inside its current window.
+  /// Every budget with the amount spent inside its current window. One query
+  /// for the whole list, so the dashboard does not fan out into N of them.
   ///
-  /// One query does the whole job. The three possible windows (week, month,
-  /// year) are computed in Dart — so daylight saving and month lengths are
-  /// handled by `DateTime` rather than by SQL date maths — and then selected
-  /// per row with a `CASE` on the budget's period. The alternative, a query per
-  /// budget, would be N+1.
+  /// The week, month and year windows are computed in Dart, so month lengths
+  /// and daylight saving stay `DateTime`'s problem, and then picked per row
+  /// with a `CASE` on the budget's period.
   Stream<List<BudgetProgress>> watchProgress({
     required DateTime now,
     required Currency currency,
@@ -130,11 +128,9 @@ ORDER BY c.name
     );
   }
 
-  /// Creates or replaces the limit for a category and period.
-  ///
-  /// `UNIQUE(category_id, period)` in the schema makes "one limit per category
-  /// per period" a database guarantee, and this upsert leans on it instead of
-  /// racing a read-then-write.
+  /// `UNIQUE(category_id, period)` makes "one limit per category per period" a
+  /// database guarantee; the upsert below leans on it, so two saves landing
+  /// together cannot both win a read-then-write.
   Future<void> setLimit({
     required int categoryId,
     required BudgetPeriod period,

@@ -9,7 +9,6 @@ import '../providers.dart';
 import '../theme.dart';
 import '../widgets/amount_field.dart';
 
-/// Opens the account editor. Pass [existing] to edit.
 Future<void> showAccountEditor(BuildContext context, {Account? existing}) {
   return showModalBottomSheet<void>(
     context: context,
@@ -19,7 +18,6 @@ Future<void> showAccountEditor(BuildContext context, {Account? existing}) {
   );
 }
 
-/// Creates and edits accounts.
 class AccountEditorSheet extends ConsumerStatefulWidget {
   const AccountEditorSheet({super.key, this.existing});
 

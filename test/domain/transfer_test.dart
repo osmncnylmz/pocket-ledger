@@ -73,7 +73,7 @@ void main() {
     );
   });
 
-  test('every problem has a human explanation', () {
+  test('each problem has a message', () {
     for (final problem in TransferProblem.values) {
       expect(describeTransferProblem(problem), isNotEmpty);
     }

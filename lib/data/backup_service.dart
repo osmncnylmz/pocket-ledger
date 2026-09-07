@@ -5,7 +5,6 @@ import 'package:drift/drift.dart';
 import '../domain/enums.dart';
 import 'database.dart';
 
-/// Result of reading a backup file back in.
 final class ImportSummary {
   const ImportSummary({
     required this.accounts,
@@ -22,7 +21,6 @@ final class ImportSummary {
   int get total => accounts + categories + transactions + budgets;
 }
 
-/// Thrown when a file does not look like a Pocket Ledger backup.
 final class BackupFormatException implements Exception {
   const BackupFormatException(this.message);
 
@@ -32,13 +30,10 @@ final class BackupFormatException implements Exception {
   String toString() => 'BackupFormatException: $message';
 }
 
-/// Whole-database export and import as JSON.
-///
-/// For a local-first app this *is* the backup story: there is no server to
-/// restore from, so the user has to be able to take their data out in a format
-/// they can read, keep, and put back. The file is a straight dump of the four
-/// tables plus a header, which means a future version can always migrate an old
-/// export by looking at [schemaVersionKey].
+/// With no server behind it, this is the backup story: the user has to be
+/// able to take their data out in a format they can read and put back. The
+/// file is a straight dump of the four tables plus a header, so a future
+/// version can always migrate an old export by reading [schemaVersionKey].
 final class BackupService {
   const BackupService(this._db);
 
@@ -48,8 +43,8 @@ final class BackupService {
   static const formatVersion = 1;
   static const schemaVersionKey = 'schemaVersion';
 
-  /// Serialises the whole database. Pretty-printed on purpose: a backup you
-  /// cannot read in a text editor is a backup you cannot trust.
+  /// Pretty-printed on purpose. A backup you cannot read in a text editor is
+  /// a backup you cannot trust.
   Future<String> exportToJson({DateTime? now}) async {
     final accounts = await _db.select(_db.accounts).get();
     final categories = await _db.select(_db.categories).get();
@@ -119,12 +114,10 @@ final class BackupService {
 
   /// Replaces the whole database with the contents of [json].
   ///
-  /// Runs inside a single SQL transaction: either the entire ledger is
-  /// replaced or nothing is, so a malformed file halfway through cannot leave
-  /// the user with half their history.
-  ///
-  /// Throws [BackupFormatException] for anything that is not a well-formed
-  /// backup.
+  /// One SQL transaction: either the entire ledger is replaced or nothing is,
+  /// so a file that turns out to be malformed halfway through cannot leave the
+  /// user holding half their history. Throws [BackupFormatException] for
+  /// anything that is not a well-formed backup.
   Future<ImportSummary> importFromJson(String json) async {
     final Object? decoded;
     try {

@@ -7,7 +7,6 @@ import '../category_icons.dart';
 import '../providers.dart';
 import '../theme.dart';
 
-/// Opens the category editor. Pass [existing] to edit.
 Future<void> showCategoryEditor(
   BuildContext context, {
   Category? existing,
@@ -22,7 +21,6 @@ Future<void> showCategoryEditor(
   );
 }
 
-/// Creates and edits categories.
 class CategoryEditorSheet extends ConsumerStatefulWidget {
   const CategoryEditorSheet({
     super.key,

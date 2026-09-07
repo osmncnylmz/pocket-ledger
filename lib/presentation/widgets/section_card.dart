@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-/// A titled card. Every block on the dashboard is one of these, which is what
-/// gives the screen its rhythm.
+/// Card with an optional title row. Every block on the dashboard is one.
 class SectionCard extends StatelessWidget {
   const SectionCard({
     required this.child,
@@ -64,7 +63,7 @@ class SectionCard extends StatelessWidget {
   }
 }
 
-/// A short, unobtrusive failure message for a section that could not load.
+/// Error line shown in place of the section body.
 class SectionError extends StatelessWidget {
   const SectionError({required this.message, super.key});
 
@@ -89,8 +88,8 @@ class SectionError extends StatelessWidget {
   }
 }
 
-/// Placeholder shown while a section's query is still running. Sized to the
-/// content it replaces so the layout does not jump when data arrives.
+/// Sized to the content it stands in for, so the layout does not jump when
+/// the query comes back.
 class SectionLoading extends StatelessWidget {
   const SectionLoading({required this.height, super.key});
 

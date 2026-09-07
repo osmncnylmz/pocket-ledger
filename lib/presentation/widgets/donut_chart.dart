@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-/// One wedge of a [DonutChart].
 @immutable
 class DonutSlice {
   const DonutSlice({
@@ -15,17 +14,14 @@ class DonutSlice {
 
   final String label;
 
-  /// Any non-negative magnitude; the chart works in proportions.
+  /// Any non-negative magnitude; the chart only works in proportions.
   final int value;
 
   final Color color;
 }
 
-/// A donut chart drawn with [CustomPainter].
-///
-/// Animates its sweep on first build and whenever the data changes, growing
-/// each wedge from zero rather than cross-fading, which reads as the numbers
-/// arriving. Honours the platform's reduced-motion setting.
+/// Sweeps on first build and whenever the data changes, growing each wedge
+/// from zero. Honours the platform's reduced-motion setting.
 class DonutChart extends StatefulWidget {
   const DonutChart({
     required this.slices,
@@ -44,7 +40,7 @@ class DonutChart extends StatefulWidget {
 
   final ValueChanged<int?>? onSliceTapped;
 
-  /// Widget drawn inside the ring, typically the total.
+  /// Drawn in the hole. Usually the total.
   final Widget? centre;
 
   @override
@@ -160,7 +156,7 @@ class _DonutPainter extends CustomPainter {
   final double progress;
   final int? selectedIndex;
 
-  /// A whole turn, starting at 12 o'clock.
+  /// Wedges start at 12 o'clock and run clockwise.
   static const _startAngle = -math.pi / 2;
   static const _fullTurn = math.pi * 2;
 
@@ -192,8 +188,8 @@ class _DonutPainter extends CustomPainter {
       final share = slice.value / total;
       final fullSweep = share * _fullTurn;
       final sweep = fullSweep * progress;
-      // Only inset a gap when the finished wedge is wide enough to keep it.
-      // Measured against the full sweep so gaps do not pop in mid-animation.
+      // Measured against the full sweep, not the animated one, so gaps do not
+      // pop into existence part way through the animation.
       final gap = fullSweep > _gap * 3 ? _gap : 0.0;
       final dimmed = selectedIndex != null && selectedIndex != i;
 
@@ -214,8 +210,7 @@ class _DonutPainter extends CustomPainter {
     }
   }
 
-  /// The index of the wedge under [position], or null for the hole and the
-  /// area outside the ring.
+  /// Null for the hole in the middle and for anything outside the ring.
   int? sliceAt(Offset position, Size size) {
     final total = _total;
     if (total <= 0) return null;
